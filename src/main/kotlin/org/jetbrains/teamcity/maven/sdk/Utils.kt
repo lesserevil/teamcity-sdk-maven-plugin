@@ -102,7 +102,14 @@ class TeamCityRetriever(val teamcitySourceURL: String,
 
         logInfo("Downloading TeamCity from $sourceURL")
 
-        val source = URL(sourceURL)
+        var source = URL(sourceURL)
+        var urlConnection: URLConnection = source.openConnection()
+        var redirect: String = urlConnection.getHeaderField("Location")
+        while (redirect != null) {
+            source = URL(redirect)
+            redirect: String = urlConnection.getHeaderField("Location")
+        }
+        
         val sourceStream = source.openStream()
         val downloadCounter = CountingInputStream(sourceStream)
 
